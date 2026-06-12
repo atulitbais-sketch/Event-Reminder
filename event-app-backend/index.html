@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Informative App</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+</head>
+<body>
+
+  <header>
+    <h1>Welcome to the Informative App</h1>
+    <p>Your gateway to national-level competitions and events</p>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="events.html">Events</a>
+      <a href="about.html">About</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="search-container">
+      <input type="text" id="searchInput" placeholder="Search events..." />
+    </section>
+
+    <section class="info-section">
+      <h2>Find the Latest Exams & Sports Competitions</h2>
+      <p>Stay updated with upcoming events happening across India. Explore competitive exams, tournaments, and more—curated just for you.</p>
+    </section>
+    <div class="lottie-container">
+        <lottie-player 
+        src="https://assets9.lottiefiles.com/packages/lf20_tno6cg2w.json" 
+          background="transparent" 
+          speed="1" 
+          style="width: 300px; height: 300px;" 
+          loop 
+          autoplay>
+        </lottie-player>
+        <ul class="event-list" id="eventList"></ul>
+<p id="noMatch" style="text-align: center; margin-top: 1rem; color: #dc2626; display: none;">
+  ⚠️ No matching events found.
+</p>
+
+      </div>
+      
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Informative App. All rights reserved.</p>
+  </footer>
+  <script>
+    const eventList = document.getElementById("eventList");
+    const searchInput = document.getElementById("searchInput");
+    const noMatch = document.getElementById("noMatch");
+    let allEvents = [];
+  
+    // Fetch events from backend
+    async function fetchEvents() {
+      try {
+        const response = await fetch("http://localhost:5000/events");
+        const data = await response.json();
+        allEvents = data;
+        renderEvents(allEvents);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    }
+  
+    // Render events to the page
+    function renderEvents(events) {
+      eventList.innerHTML = "";
+  
+      if (events.length === 0) {
+        noMatch.style.display = "block";
+        return;
+      } else {
+        noMatch.style.display = "none";
+      }
+  
+      events.forEach((event) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <strong>${event.name}</strong><br/>
+          <em>${event.location} - ${event.date}</em>
+        `;
+        eventList.appendChild(li);
+      });
+    }
+  
+    // Filter events on search input
+    searchInput.addEventListener("input", () => {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filtered = allEvents.filter(event =>
+        event.name.toLowerCase().includes(searchTerm) ||
+        event.location.toLowerCase().includes(searchTerm) ||
+        event.date.toLowerCase().includes(searchTerm)
+      );
+      renderEvents(filtered);
+    });
+  
+    // Fetch on load
+    fetchEvents();
+  </script>
+  
+</body>
+</html>
